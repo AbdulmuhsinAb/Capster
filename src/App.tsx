@@ -1,18 +1,37 @@
-import { useQuery } from "@tanstack/react-query"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { createContext, useState } from "react"
 
-import { Button } from "./components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "./components/ui/card"
-import { Product } from "./types"
-import api from "./api"
+import { Home } from "./pages/home"
+import { Dashboard } from "./pages/dashboard"
 
 import "./App.css"
+import { Product } from "./types"
+import api from "./api"
+import { useQuery } from "@tanstack/react-query"
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />
+  }
+])
+type GlobalStateContext = {
+  state: GlobalState
+  handleAddToCart: (product: Product) => void
+}
+type GlobalState = {
+  cart: Product[]
+  products: {
+    items: Product[] | undefined
+    errors: undefined | Error
+  }
+}
+
+export const Context = createContext<GlobalStateContext | null>(null)
 
 function App() {
   const getProducts = async () => {
@@ -24,34 +43,50 @@ function App() {
       return Promise.reject(new Error("Something went wrong"))
     }
   }
-
   // Queries
-  const { data, error } = useQuery<Product[]>({
+  const { data, error, isPending } = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: getProducts
   })
+  console.log({ data, error, isPending })
 
+  const [state, setState] = useState<GlobalState>({
+    cart: [],
+    products: {
+      items: undefined,
+      errors: undefined
+    }
+  })
+
+  if (data && !state.products.items) {
+    setState({
+      ...state,
+      products: {
+        ...state.products,
+        items: data
+      }
+    })
+  }
+  if (error && !state.products.errors) {
+    setState({
+      ...state,
+      products: {
+        ...state.products,
+        errors: error
+      }
+    })
+  }
+  const handleAddToCart = (product: Product) => {
+    setState({
+      ...state,
+      cart: [...state.cart, product]
+    })
+  }
   return (
     <div className="App">
-      <h1 className="text-2xl uppercase mb-10">Products</h1>
-
-      <section className="flex flex-col md:flex-row gap-4 justify-between max-w-6xl mx-auto">
-        {data?.map((product) => (
-          <Card key={product.id} className="w-[350px]">
-            <CardHeader>
-              <CardTitle>{product.name}</CardTitle>
-              <CardDescription>Some Description here</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Card Content Here</p>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full">Add to cart</Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </section>
-      {error && <p className="text-red-500">{error.message}</p>}
+      <Context.Provider value={{ state, handleAddToCart }}>
+        <RouterProvider router={router} />
+      </Context.Provider>
     </div>
   )
 }
