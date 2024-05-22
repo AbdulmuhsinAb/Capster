@@ -1,5 +1,5 @@
 import { Context } from "@/App"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useContext, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
@@ -7,15 +7,17 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from ".
 import { EditProductBtn } from "./EditProductBtn"
 import { DeleteProductBtn } from "./DeleteProductBtn"
 import ProductService from "../../api/products"
+import { Product } from "@/types"
 
 export function ProductDashboard() {
   const queryClient = useQueryClient()
-  const context = useContext(Context)
-  if (!context) throw Error
-  const { state } = context
+  const { data: products, error: productError } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: ProductService.getAll
+  })
 
   //Product
-  const products = state.products.items
+
   const [item, setItem] = useState({
     categoryId: "",
     name: "",
