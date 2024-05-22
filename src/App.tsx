@@ -8,6 +8,7 @@ import "./App.css"
 import { Product } from "./types"
 import api from "./api"
 import { useQuery } from "@tanstack/react-query"
+import ProductService from "../src/api/products"
 
 const router = createBrowserRouter([
   {
@@ -34,21 +35,11 @@ type GlobalState = {
 export const Context = createContext<GlobalStateContext | null>(null)
 
 function App() {
-  const getProducts = async () => {
-    try {
-      const res = await api.get("/products")
-      return res.data
-    } catch (error) {
-      console.error(error)
-      return Promise.reject(new Error("Something went wrong"))
-    }
-  }
   // Queries
-  const { data, error, isPending } = useQuery<Product[]>({
+  const { data, error } = useQuery<Product[]>({
     queryKey: ["products"],
-    queryFn: getProducts
+    queryFn: ProductService.getAll
   })
-  console.log({ data, error, isPending })
 
   const [state, setState] = useState<GlobalState>({
     cart: [],
