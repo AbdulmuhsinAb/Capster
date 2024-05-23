@@ -1,6 +1,5 @@
-import { Context } from "@/App"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table"
@@ -24,7 +23,8 @@ export function ProductDashboard() {
     description: "",
     stock: 0,
     price: 0,
-    color: ""
+    color: "",
+    img: ""
   })
   const handleChangeItem = (e) => {
     const { name, value } = e.target
@@ -86,6 +86,13 @@ export function ProductDashboard() {
           className="mt-4"
           type="text"
           placeholder="Color"
+          onChange={handleChangeItem}
+        />
+        <Input
+          name="img"
+          className="mt-4"
+          type="text"
+          placeholder="Image URL"
           onChange={handleChangeItem}
         />
         <Button type="submit" className="mt-4">

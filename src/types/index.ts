@@ -6,6 +6,7 @@ export type Product = {
   stock: number
   price: number
   color: string
+  img: string
 }
 export type Category = {
   id: string

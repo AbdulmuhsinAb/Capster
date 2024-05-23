@@ -27,7 +27,8 @@ export function EditProductBtn({ product, id }: EditProductProps) {
     description: product.description,
     stock: product.stock,
     price: product.price,
-    color: product.color
+    color: product.color,
+    img: product.img
   })
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -98,6 +99,15 @@ export function EditProductBtn({ product, id }: EditProductProps) {
             <Input
               name="color"
               defaultValue={product.color}
+              className="col-span-3"
+              onChange={handleChange}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Image URL</Label>
+            <Input
+              name="img"
+              defaultValue={product.img}
               className="col-span-3"
               onChange={handleChange}
             />

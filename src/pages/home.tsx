@@ -9,36 +9,46 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { useContext } from "react"
+import ProductService from "../api/products"
+import { useQuery } from "@tanstack/react-query"
+import { Product } from "@/types"
+import { NavBar } from "@/components/navbar"
+import { Link } from "react-router-dom"
 
 export function Home() {
   const context = useContext(Context)
   if (!context) throw Error
   const { state, handleAddToCart } = context
-  const data = state.products.items
-  const error = state.products.errors
-
+  const { data: products, error: productError } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: ProductService.getAll
+  })
   return (
     <>
-      <h1 className="text-2xl uppercase mb-10">Products</h1>
+      <NavBar />
       <section className="flex flex-col md:flex-row gap-4 justify-between max-w-6xl mx-auto">
-        {data?.map((product) => (
-          <Card key={product.id} className="w-[350px]">
+        {products?.map((aProduct) => (
+          <Card key={aProduct.id} className="w-[350px]">
             <CardHeader>
-              <CardTitle>{product.name}</CardTitle>
-              <CardDescription>Some Description here</CardDescription>
+              <img className="mb-4 h-60 object-contain" src={aProduct.img} alt={aProduct.name} />
+              <CardTitle>{aProduct.name}</CardTitle>
+              <CardDescription>{aProduct.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <p>Card Content Here</p>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" onClick={() => handleAddToCart(product)}>
+              <Button className="w-full" onClick={() => handleAddToCart(aProduct)}>
                 Add to cart
+              </Button>
+              <Button className="w-full">
+                <Link to={"/products/" + aProduct.id}>Details</Link>
               </Button>
             </CardFooter>
           </Card>
         ))}
       </section>
-      {error && <p className="text-red-500">{error.message}</p>}
+      {productError && <p className="text-red-500">{productError.message}</p>}
     </>
   )
 }
