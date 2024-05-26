@@ -5,6 +5,8 @@ import {
 } from "@radix-ui/react-navigation-menu"
 import { Link } from "react-router-dom"
 import { Cart } from "./cart"
+import { User2 } from "lucide-react"
+import { Button } from "./ui/button"
 
 export function NavBar() {
   return (
@@ -23,7 +25,14 @@ export function NavBar() {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <Cart />
+      <div className="flex justify-evenly">
+        <Button variant="link" className=" pb-6">
+          <Link to="/login">
+            <User2 href="login" />
+          </Link>
+        </Button>
+        <Cart />
+      </div>
     </div>
   )
 }

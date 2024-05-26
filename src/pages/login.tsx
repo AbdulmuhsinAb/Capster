@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChangeEvent, FormEvent, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 type UserCredentials = {
   email: string
@@ -12,6 +12,7 @@ type UserCredentials = {
 }
 
 export function Login() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [credentials, setCredentials] = useState({
     email: "",
@@ -35,10 +36,11 @@ export function Login() {
   }
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    const response = await login(credentials)
-    localStorage.setItem("token:", response)
-
-    queryClient.invalidateQueries({ queryKey: ["users"] })
+    const token = await login(credentials)
+    localStorage.setItem("token", token)
+    if (token) {
+      navigate("/")
+    }
   }
   return (
     <div>
