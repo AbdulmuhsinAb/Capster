@@ -8,6 +8,9 @@ import "./App.css"
 import { Product } from "./types"
 import { ProductDetails } from "./pages/productDetails"
 
+import { Signup } from "./pages/signup"
+import { Login } from "./pages/login"
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,6 +23,14 @@ const router = createBrowserRouter([
   {
     path: "/products/:productId",
     element: <ProductDetails />
+  },
+  {
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "/signup",
+    element: <Signup />
   }
 ])
 type GlobalStateContext = {

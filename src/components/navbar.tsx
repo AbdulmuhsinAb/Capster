@@ -1,7 +1,6 @@
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList
 } from "@radix-ui/react-navigation-menu"
 import { Link } from "react-router-dom"
@@ -14,19 +13,13 @@ export function NavBar() {
       <NavigationMenu>
         <NavigationMenuList className="flex justify-between gap-5 ">
           <NavigationMenuItem>
-            <Link to="/docs">
-              <NavigationMenuLink>Home</NavigationMenuLink>
-            </Link>
+            <Link to="/">Home</Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link to="/docs">
-              <NavigationMenuLink>Dashboard</NavigationMenuLink>
-            </Link>
+            <Link to="/dashboard">Dashboard</Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link to="/docs">
-              <NavigationMenuLink>About us</NavigationMenuLink>
-            </Link>
+            <Link to="/docs">About us</Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

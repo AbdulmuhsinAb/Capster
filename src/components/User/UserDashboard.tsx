@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, Children, FormEvent, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table"
@@ -10,7 +10,6 @@ import { DeleteUserBtn } from "./DeleteUserBtn"
 
 export function UserDashboard() {
   const queryClient = useQueryClient()
-  // creeate user
   const [user, setUser] = useState({
     fullName: "",
     email: "",
@@ -25,14 +24,14 @@ export function UserDashboard() {
     })
   }
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     await UserService.createOne(user)
     queryClient.invalidateQueries({ queryKey: ["users"] })
   }
   const [deleteId, setDeleteId] = useState("")
 
-  const handleSubmitDelete = async (e: any) => {
+  const handleSubmitDelete = async (e: FormEvent) => {
     e.preventDefault()
     await UserService.deleteOne(deleteId)
     queryClient.invalidateQueries({ queryKey: ["users"] })
@@ -68,7 +67,7 @@ export function UserDashboard() {
         <Input
           name="password"
           className="mt-4"
-          type="text"
+          type="password"
           placeholder="Password"
           onChange={handleChange}
         />
@@ -101,7 +100,7 @@ export function UserDashboard() {
               <TableHead>ID</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead></TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,8 +111,8 @@ export function UserDashboard() {
                 <TableCell className="text-left">{aUser.email}</TableCell>
                 <TableCell className="text-left">{aUser.role}</TableCell>
                 <TableCell className="text-left">
-                  <DeleteUserBtn id={aUser.userId} />
                   <EditUserBtn user={aUser} id={aUser.userId} />
+                  <DeleteUserBtn id={aUser.userId} />
                 </TableCell>
               </TableRow>
             ))}

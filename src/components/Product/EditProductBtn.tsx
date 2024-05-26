@@ -24,12 +24,14 @@ export function EditProductBtn({ product, id }: EditProductProps) {
   const queryClient = useQueryClient()
   const [updatedProduct, setUpdatedProduct] = useState({
     name: product.name,
+    categoryId: product.categoryId,
     description: product.description,
     stock: product.stock,
     price: product.price,
     color: product.color,
     img: product.img
   })
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setUpdatedProduct({
@@ -63,6 +65,17 @@ export function EditProductBtn({ product, id }: EditProductProps) {
             <Input
               name="name"
               defaultValue={product.name}
+              className="col-span-3"
+              onChange={handleChange}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="CategoryId" className="text-right">
+              Category ID
+            </Label>
+            <Input
+              name="CategoryId"
+              defaultValue={product.categoryId}
               className="col-span-3"
               onChange={handleChange}
             />

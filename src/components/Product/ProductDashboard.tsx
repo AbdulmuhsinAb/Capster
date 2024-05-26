@@ -1,12 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table"
 import { EditProductBtn } from "./EditProductBtn"
 import { DeleteProductBtn } from "./DeleteProductBtn"
 import ProductService from "../../api/products"
-import { Product } from "@/types"
+import CategoryService from "../../api/categories"
+import { Category, Product } from "@/types"
+import { log } from "console"
 
 export function ProductDashboard() {
   const queryClient = useQueryClient()
@@ -14,9 +16,10 @@ export function ProductDashboard() {
     queryKey: ["products"],
     queryFn: ProductService.getAll
   })
-
-  //Product
-
+  const { data: categories, error: categoryError } = useQuery<Category[]>({
+    queryKey: ["categorys"],
+    queryFn: CategoryService.getAll
+  })
   const [item, setItem] = useState({
     categoryId: "",
     name: "",
@@ -26,7 +29,25 @@ export function ProductDashboard() {
     color: "",
     img: ""
   })
-  const handleChangeItem = (e) => {
+
+  const productsWithCat = products?.map((p) => {
+    const category = categories?.find((cat) => cat.id === p.categoryId)
+    if (category)
+      return {
+        ...p,
+        categoryId: category.categoryName
+      }
+    return p
+  })
+
+  const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
+    setItem({
+      ...item,
+      categoryId: e.target.value
+    })
+  }
+
+  const handleChangeItem = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setItem({
       ...item,
@@ -34,8 +55,9 @@ export function ProductDashboard() {
     })
   }
 
-  const handleSubmitItem = async (e) => {
+  const handleSubmitItem = async (e: FormEvent) => {
     e.preventDefault()
+    if (item.categoryId == "") item.categoryId = "9e582037-df88-453b-9dc3-c970f36659de"
     await ProductService.createOne(item)
     queryClient.invalidateQueries({ queryKey: ["products"] })
   }
@@ -47,19 +69,25 @@ export function ProductDashboard() {
       <form className="mt-20 w-1/3 mx-auto" onSubmit={handleSubmitItem}>
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Create a Product</h3>
         <Input
-          name="categoryId"
-          className="mt-4"
-          type="text"
-          placeholder="Category ID"
-          onChange={handleChangeItem}
-        />
-        <Input
           name="name"
           className="mt-4"
           type="text"
           placeholder="Product Name"
           onChange={handleChangeItem}
         />
+        <select
+          name="Categories"
+          onChange={handleSelect}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-4"
+        >
+          {categories?.map((cat) => {
+            return (
+              <option key={cat.id} value={cat.id}>
+                {cat.categoryName}
+              </option>
+            )
+          })}
+        </select>
         <Input
           name="description"
           className="mt-4"
@@ -107,7 +135,7 @@ export function ProductDashboard() {
           <TableRow>
             <TableHead className="w-[100px]">Name</TableHead>
             <TableHead>ID</TableHead>
-            <TableHead>Category ID</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Color</TableHead>
             <TableHead>Stock</TableHead>
@@ -116,7 +144,7 @@ export function ProductDashboard() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {products?.map((aProduct) => (
+          {productsWithCat?.map((aProduct) => (
             <TableRow key={aProduct.id}>
               <TableCell className="font-medium text-left">{aProduct.name}</TableCell>
               <TableCell className="text-left">{aProduct.id}</TableCell>
