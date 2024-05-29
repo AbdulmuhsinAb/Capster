@@ -1,15 +1,17 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { createContext, useState } from "react"
+import { createContext, useEffect, useState } from "react"
 
 import { Home } from "./pages/home"
 import { Dashboard } from "./pages/dashboard"
 
 import "./App.css"
-import { Product } from "./types"
+import { DecodedUser, Product } from "./types"
 import { ProductDetails } from "./pages/productDetails"
 
 import { Signup } from "./pages/signup"
 import { Login } from "./pages/login"
+import { PrivateRoute } from "./components/PrivateRoute"
+import { Catalog } from "./pages/catalog"
 
 const router = createBrowserRouter([
   {
@@ -18,7 +20,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    )
   },
   {
     path: "/products/:productId",
@@ -31,27 +37,46 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />
+  },
+  {
+    path: "/Catalog",
+    element: <Catalog />
   }
 ])
 type GlobalStateContext = {
   state: GlobalState
   handleAddToCart: (product: Product) => void
   handleDeleteFromCart: (id: string) => void
+  handleStoreUser: (user: DecodedUser) => void
+  handleEmptyCart: () => void
+  handleRemoveUser: () => void
 }
 type GlobalState = {
   cart: Product[]
+  user: DecodedUser | null
 }
 
 export const Context = createContext<GlobalStateContext | null>(null)
 
 function App() {
   const [state, setState] = useState<GlobalState>({
-    cart: []
+    cart: [],
+    user: null
   })
-
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    if (user) {
+      const decodedUser = JSON.parse(user)
+      setState({
+        ...state,
+        user: decodedUser
+      })
+    }
+  }, [])
   const handleAddToCart = (product: Product) => {
-    const isDuplicated = state.cart.find((cartItem) => cartItem.id == product.id)
-    if (isDuplicated) return
+    // const isDuplicated = state.cart.find((cartItem) => cartItem.id == product.id)
+    // if (isDuplicated) return
+
     setState({
       ...state,
       cart: [...state.cart, product]
@@ -59,16 +84,48 @@ function App() {
   }
 
   const handleDeleteFromCart = (id: string) => {
-    const filteredCart = state.cart.filter((item) => item.id !== id)
+    const cart = state.cart
+    const index = state.cart.findIndex((item) => item.id === id)
+    cart.splice(index, 1)
     setState({
       ...state,
-      cart: filteredCart
+      cart: cart
     })
   }
 
+  const handleEmptyCart = () => {
+    setState({
+      ...state,
+      cart: []
+    })
+  }
+
+  const handleStoreUser = (user: DecodedUser) => {
+    setState({
+      ...state,
+      user
+    })
+  }
+
+  const handleRemoveUser = () => {
+    localStorage.removeItem("token")
+    setState({
+      ...state,
+      user: null
+    })
+  }
   return (
     <div className="App">
-      <Context.Provider value={{ state, handleAddToCart, handleDeleteFromCart }}>
+      <Context.Provider
+        value={{
+          state,
+          handleAddToCart,
+          handleDeleteFromCart,
+          handleStoreUser,
+          handleEmptyCart,
+          handleRemoveUser
+        }}
+      >
         <RouterProvider router={router} />
       </Context.Provider>
     </div>

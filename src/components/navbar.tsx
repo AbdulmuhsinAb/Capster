@@ -1,38 +1,23 @@
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList
-} from "@radix-ui/react-navigation-menu"
-import { Link } from "react-router-dom"
-import { Cart } from "./cart"
-import { User2 } from "lucide-react"
-import { Button } from "./ui/button"
+import { useContext } from "react"
+import { Context } from "@/App"
+import { ROLE } from "@/types"
+import { AdminNavBar } from "./AdminNavBar"
+import { UserNavBar } from "./User/UserNavBar"
 
 export function NavBar() {
-  return (
-    <div className="flex justify-between mb-5">
-      <h3>LOGO</h3>
-      <NavigationMenu>
-        <NavigationMenuList className="flex justify-between gap-5 ">
-          <NavigationMenuItem>
-            <Link to="/">Home</Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link to="/dashboard">Dashboard</Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link to="/docs">About us</Link>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-      <div className="flex justify-evenly">
-        <Button variant="link" className=" pb-6">
-          <Link to="/login">
-            <User2 href="login" />
-          </Link>
-        </Button>
-        <Cart />
+  const context = useContext(Context)
+  if (!context) throw Error
+  const { state } = context
+  if (state.user?.role === ROLE.Admin)
+    return (
+      <div className="sticky top-0 bg-white">
+        <AdminNavBar />
       </div>
+    )
+
+  return (
+    <div className="sticky top-0 bg-white">
+      <UserNavBar />
     </div>
   )
 }
