@@ -1,12 +1,11 @@
 import api from "@/api"
 import { Category } from "@/types"
 import { useQueryClient, useQuery } from "@tanstack/react-query"
-import { useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table"
 import { DeleteCategoryBtn } from "./DeleteCategoryBtn"
-import { EditCategoryBtn } from "./EditCategoryBtn"
 
 export function CategoryDashboard() {
   const queryClient = useQueryClient()
@@ -14,7 +13,7 @@ export function CategoryDashboard() {
   const [category, setCategory] = useState({
     categoryName: ""
   })
-  const handleChangeCategory = (e) => {
+  const handleChangeCategory = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setCategory({
       ...category,
@@ -30,7 +29,7 @@ export function CategoryDashboard() {
       return Promise.reject(new Error("Something went wrong"))
     }
   }
-  const handleSubmitCategory = async (e) => {
+  const handleSubmitCategory = async (e: FormEvent) => {
     e.preventDefault()
     await postCategory()
     queryClient.invalidateQueries({ queryKey: ["categorys"] })
